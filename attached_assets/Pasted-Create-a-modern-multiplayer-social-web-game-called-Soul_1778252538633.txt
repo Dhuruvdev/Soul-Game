@@ -1,0 +1,656 @@
+Create a modern multiplayer social web game called “SoulSync” with a soft pastel Gen-Z aesthetic inspired EXACTLY by the attached reference designs.
+
+The UI must feel:
+
+dreamy
+
+cozy
+
+Discord Nitro quality
+
+dopamine-rich
+
+Pinterest aesthetic
+
+soft glassmorphism
+
+clean and spacious
+
+highly animated
+
+cute but premium
+
+NOT childish
+
+NOT cluttered
+
+
+The entire product should look like: “Discord profile cards + Spotify Wrapped + Pinterest + cozy relationship app + modern social game”
+
+Use the reference images VERY heavily for:
+
+spacing
+
+layout structure
+
+soft pastel palette
+
+rounded containers
+
+typography scale
+
+profile positioning
+
+minimal clean sections
+
+floating decorative background shapes
+
+badge layout
+
+card proportions
+
+soft shadow depth
+
+airy whitespace
+
+
+The design should feel pixel-perfect and production-ready.
+
+
+---
+
+CORE GAME IDEA
+
+SoulSync is a multiplayer Discord social game where players:
+
+make connections
+
+build bonds
+
+complete mini-games
+
+gain relationship XP
+
+unlock profile cosmetics
+
+collect titles
+
+create aesthetic identities
+
+compete in compatibility games
+
+
+The game should NEVER feel repetitive.
+
+The experience must constantly rotate:
+
+mini events
+
+social interactions
+
+evolving rooms
+
+live reactions
+
+hidden mechanics
+
+daily challenges
+
+chaotic Gen-Z humor moments
+
+emotional/social gameplay
+
+
+
+---
+
+TARGET AUDIENCE
+
+Gen Z Discord users:
+
+late night VC users
+
+Nitro users
+
+aesthetic profile lovers
+
+TikTok/Pinterest audience
+
+couples/friends
+
+chronically online users
+
+fandom communities
+
+streamers
+
+cozy game audience
+
+
+The game should feel instantly shareable on:
+
+Discord
+
+TikTok
+
+Instagram stories
+
+
+
+---
+
+VISUAL DESIGN SYSTEM
+
+Use EXACTLY the visual identity from the references:
+
+BACKGROUND
+
+Large soft pastel abstract shapes:
+
+lavender
+
+pink
+
+lilac
+
+soft blue
+
+cream
+
+transparent blobs
+
+floating circles
+
+abstract waves
+
+squiggles
+
+
+Background should have:
+
+parallax movement
+
+floating animation
+
+blur depth
+
+gradient overlays
+
+
+
+---
+
+MAIN CARD DESIGN
+
+The central card must look IDENTICAL in style to the references:
+
+huge rounded white container
+
+ultra soft shadow
+
+subtle inner borders
+
+split sections
+
+minimal dividers
+
+oversized typography
+
+soft icon pills
+
+pastel metric badges
+
+
+The card should feel:
+
+collectible
+
+customizable
+
+screenshot-worthy
+
+
+
+---
+
+PROFILE SECTION
+
+Large profile area with:
+
+animated avatar frame
+
+status glow
+
+username typography similar to reference
+
+level progression
+
+XP bar
+
+relationship titles
+
+mood status
+
+aesthetic tags
+
+
+Example: 💖 soft soul 🌙 night owl 🎧 emotionally online 🍓 delulu certified
+
+
+---
+
+SOCIAL SYSTEM
+
+Players can:
+
+add friends
+
+create duos
+
+form squads
+
+send hearts
+
+send anonymous compliments
+
+exchange stickers
+
+react live
+
+share moods
+
+visit profiles
+
+
+
+---
+
+BOND SYSTEM
+
+Every interaction increases bond XP:
+
+voice chatting
+
+gaming together
+
+matching answers
+
+winning mini-games
+
+daily streaks
+
+gifting items
+
+
+Bond levels unlock:
+
+animations
+
+profile themes
+
+floating particles
+
+custom card backgrounds
+
+badges
+
+aura effects
+
+
+
+---
+
+MINI GAMES
+
+The game should contain MANY fast addictive mini-games.
+
+Examples:
+
+1. Typing Chemistry
+
+Two players type simultaneously. If rhythm syncs:
+
+combo multiplier rises
+
+heart particles explode
+
+music intensifies
+
+
+
+---
+
+2. Delulu Detector
+
+Players answer chaotic Gen-Z questions:
+
+“Would you survive as roommates?”
+
+“Who replies dry?”
+
+“Who would ghost first?”
+
+
+Results create funny compatibility cards.
+
+
+---
+
+3. Emoji Panic
+
+Fast reaction emoji battle:
+
+spam matching emojis
+
+dodge fake emojis
+
+combo chains
+
+
+Very flashy and satisfying.
+
+
+---
+
+4. Memory Lane
+
+Players remember details about each other:
+
+favorite food
+
+sleep schedule
+
+toxic trait
+
+music taste
+
+
+
+---
+
+5. Secret Voting
+
+Anonymous social voting system:
+
+cutest duo
+
+most chaotic
+
+greenest flag
+
+certified simp
+
+
+
+---
+
+LIVE SOCIAL FEATURES
+
+Add:
+
+live reactions floating across screen
+
+typing indicators
+
+avatar emotes
+
+sound effects
+
+animated stickers
+
+profile hover cards
+
+smooth transitions
+
+fake “online energy”
+
+
+Everything should feel alive.
+
+
+---
+
+GEN Z RELATABLE FEATURES
+
+Include:
+
+“delulu meter”
+
+“red flag percentage”
+
+“chronically online level”
+
+“reply speed”
+
+“mood aura”
+
+“main character energy”
+
+“Spotify vibe”
+
+“sleep schedule chaos”
+
+“toxic duo title”
+
+
+Use ironic/funny modern internet humor naturally.
+
+
+---
+
+ROOM SYSTEM
+
+Players can join:
+
+sleepover rooms
+
+study lounges
+
+heartbreak cafe
+
+soft arcade
+
+gossip room
+
+chaotic VC
+
+
+Each room has:
+
+different visual themes
+
+ambient music
+
+animated decorations
+
+
+
+---
+
+PROGRESSION
+
+Users level up through:
+
+social activity
+
+mini-games
+
+streaks
+
+quests
+
+interactions
+
+
+Unlockables:
+
+animated profile frames
+
+gradient usernames
+
+sparkles
+
+animated backgrounds
+
+sound reactions
+
+floating pets
+
+profile music
+
+
+
+---
+
+CARD GENERATOR
+
+Generate beautiful shareable cards: like Spotify Wrapped.
+
+Examples:
+
+friendship stats
+
+compatibility results
+
+duo energy
+
+top emojis
+
+late night activity
+
+chaos level
+
+
+Cards must be:
+
+animated
+
+ultra aesthetic
+
+social media optimized
+
+
+
+---
+
+UI ANIMATION STYLE
+
+Use:
+
+Framer Motion quality animations
+
+spring transitions
+
+floating motion
+
+hover glow
+
+soft scaling
+
+blurred transitions
+
+smooth loading skeletons
+
+animated gradients
+
+
+Animations must feel:
+
+premium
+
+smooth
+
+addictive
+
+
+
+---
+
+AUDIO STYLE
+
+Soft sounds:
+
+bubble pops
+
+heart clicks
+
+UI sparkle
+
+cozy ambient loops
+
+lofi transitions
+
+
+NOT loud gaming sounds.
+
+
+---
+
+TECH STACK
+
+Build with:
+
+React
+
+Next.js
+
+TailwindCSS
+
+Framer Motion
+
+Socket.IO
+
+Supabase/Firebase
+
+Discord SDK
+
+Canvas API
+
+
+
+---
+
+DISCORD INTEGRATION
+
+Add Discord Rich Presence: Examples: 💖 Matching Souls 🌙 In Sleepover Lounge 🔥 14 Day Duo Streak 🎯 Playing Typing Chemistry
+
+Include:
+
+Discord login
+
+friend syncing
+
+invite buttons
+
+VC launch support
+
+
+
+---
+
+IMPORTANT DESIGN RULES
+
+EXACT same softness as references
+
+Keep LOTS of whitespace
+
+Avoid clutter
+
+No harsh colors
+
+No dark UI
+
+No generic gaming UI
+
+Everything rounded
+
+Soft shadows only
+
+Premium typography hierarchy
+
+Mobile-first responsive
+
+Screenshot-worthy everywhere
+
+
+The final result should feel like: “A viral Discord social game that Gen Z becomes emotionally addicted to.”

@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SoulSync multiplayer social game API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User profiles and authentication
+  - name: social
+    description: Social interactions (hearts, compliments, friends)
+  - name: bonds
+    description: Bond system between players
+  - name: rooms
+    description: Social rooms and lounges
+  - name: minigames
+    description: Mini-game sessions
+  - name: dashboard
+    description: Aggregated dashboard and wow endpoints
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +36,416 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── USER PROFILE ─────────────────────────────────────────────────────────────
+  /users/me:
+    get:
+      operationId: getMyProfile
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    put:
+      operationId: updateMyProfile
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileInput"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/{userId}:
+    get:
+      operationId: getUserProfile
+      tags: [users]
+      summary: Get a user's public profile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List/search users
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+
+  # ── FRIENDS / SOCIAL ──────────────────────────────────────────────────────────
+  /users/me/friends:
+    get:
+      operationId: getMyFriends
+      tags: [social]
+      summary: Get current user's friends list
+      responses:
+        "200":
+          description: List of friends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendEntry"
+    post:
+      operationId: addFriend
+      tags: [social]
+      summary: Send friend request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddFriendInput"
+      responses:
+        "200":
+          description: Friend relationship
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendEntry"
+
+  /social/hearts:
+    post:
+      operationId: sendHeart
+      tags: [social]
+      summary: Send a heart to another player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendHeartInput"
+      responses:
+        "200":
+          description: Heart sent confirmation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SocialActionResult"
+
+  /social/compliments:
+    post:
+      operationId: sendCompliment
+      tags: [social]
+      summary: Send anonymous compliment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendComplimentInput"
+      responses:
+        "200":
+          description: Compliment sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SocialActionResult"
+    get:
+      operationId: getMyCompliments
+      tags: [social]
+      summary: Get compliments received by current user
+      responses:
+        "200":
+          description: List of compliments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Compliment"
+
+  /social/activity:
+    get:
+      operationId: getActivityFeed
+      tags: [social]
+      summary: Get recent social activity feed
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Activity feed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEntry"
+
+  # ── BONDS ─────────────────────────────────────────────────────────────────────
+  /bonds:
+    get:
+      operationId: getMyBonds
+      tags: [bonds]
+      summary: Get all bonds for current user
+      responses:
+        "200":
+          description: List of bonds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bond"
+
+  /bonds/{userId}:
+    get:
+      operationId: getBond
+      tags: [bonds]
+      summary: Get bond between current user and another player
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bond details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bond"
+
+  # ── ROOMS ─────────────────────────────────────────────────────────────────────
+  /rooms:
+    get:
+      operationId: listRooms
+      tags: [rooms]
+      summary: List all available rooms
+      responses:
+        "200":
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+
+  /rooms/{roomId}:
+    get:
+      operationId: getRoom
+      tags: [rooms]
+      summary: Get room details and occupants
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{roomId}/join:
+    post:
+      operationId: joinRoom
+      tags: [rooms]
+      summary: Join a room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  # ── MINI-GAMES ────────────────────────────────────────────────────────────────
+  /minigames:
+    get:
+      operationId: listMinigames
+      tags: [minigames]
+      summary: List available mini-games
+      responses:
+        "200":
+          description: Mini-games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Minigame"
+
+  /minigames/sessions:
+    post:
+      operationId: createGameSession
+      tags: [minigames]
+      summary: Start a mini-game session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameSessionInput"
+      responses:
+        "200":
+          description: Game session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameSession"
+    get:
+      operationId: getMyGameSessions
+      tags: [minigames]
+      summary: Get current user's recent game sessions
+      responses:
+        "200":
+          description: Game sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameSession"
+
+  /minigames/sessions/{sessionId}/complete:
+    post:
+      operationId: completeGameSession
+      tags: [minigames]
+      summary: Mark a game session as complete with results
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteGameSessionInput"
+      responses:
+        "200":
+          description: Completed session with rewards
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameSession"
+
+  # ── DASHBOARD / WOW ENDPOINTS ─────────────────────────────────────────────────
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get personalized dashboard data
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [dashboard]
+      summary: Get top players leaderboard
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /compatibility/{userId}:
+    get:
+      operationId: getCompatibility
+      tags: [dashboard]
+      summary: Get compatibility score with another player
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Compatibility result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompatibilityResult"
+
+  /profile/stats:
+    get:
+      operationId: getProfileStats
+      tags: [dashboard]
+      summary: Get shareable profile stats card (Spotify Wrapped style)
+      responses:
+        "200":
+          description: Profile stats for sharing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileStats"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +453,387 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        level:
+          type: integer
+        xp:
+          type: integer
+        xpToNext:
+          type: integer
+        mood:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+          nullable: true
+        delulu:
+          type: integer
+          description: "Delulu meter 0-100"
+        redFlag:
+          type: integer
+          description: "Red flag percentage 0-100"
+        chronicallyOnline:
+          type: integer
+          description: "Chronically online level 0-100"
+        replySpeed:
+          type: string
+          nullable: true
+        mainCharacterEnergy:
+          type: integer
+        totalHearts:
+          type: integer
+        currentRoom:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, username, displayName, level, xp, xpToNext, tags, delulu, redFlag, chronicallyOnline, mainCharacterEnergy, totalHearts]
+
+    UpdateProfileInput:
+      type: object
+      properties:
+        displayName:
+          type: string
+        mood:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        avatarUrl:
+          type: string
+
+    FriendEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        status:
+          type: string
+          enum: [pending, accepted, blocked]
+        bondXp:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, user, status, bondXp, createdAt]
+
+    AddFriendInput:
+      type: object
+      properties:
+        targetUserId:
+          type: integer
+      required: [targetUserId]
+
+    SendHeartInput:
+      type: object
+      properties:
+        targetUserId:
+          type: integer
+      required: [targetUserId]
+
+    SendComplimentInput:
+      type: object
+      properties:
+        targetUserId:
+          type: integer
+        message:
+          type: string
+      required: [targetUserId, message]
+
+    SocialActionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        xpGained:
+          type: integer
+        message:
+          type: string
+      required: [success, xpGained, message]
+
+    Compliment:
+      type: object
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+        createdAt:
+          type: string
+      required: [id, message, createdAt]
+
+    ActivityEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [heart_sent, compliment_received, game_played, bond_leveled, room_joined, friend_added, level_up]
+        userId:
+          type: integer
+        username:
+          type: string
+        message:
+          type: string
+        xpGained:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, type, userId, username, message, createdAt]
+
+    Bond:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        xp:
+          type: integer
+        level:
+          type: integer
+        streak:
+          type: integer
+        title:
+          type: string
+          nullable: true
+        lastInteraction:
+          type: string
+      required: [id, user, xp, level, streak]
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        theme:
+          type: string
+          enum: [sleepover, study, heartbreak, arcade, gossip, chaotic_vc]
+        occupantCount:
+          type: integer
+        maxOccupants:
+          type: integer
+        occupants:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        ambience:
+          type: string
+      required: [id, name, slug, description, theme, occupantCount, maxOccupants, ambience]
+
+    Minigame:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [typing_chemistry, delulu_detector, emoji_panic, memory_lane, secret_voting]
+        playerCount:
+          type: integer
+        duration:
+          type: integer
+          description: "Duration in seconds"
+        xpReward:
+          type: integer
+        isAvailable:
+          type: boolean
+      required: [id, name, slug, description, type, playerCount, duration, xpReward, isAvailable]
+
+    CreateGameSessionInput:
+      type: object
+      properties:
+        minigameId:
+          type: integer
+        opponentId:
+          type: integer
+          nullable: true
+      required: [minigameId]
+
+    CompleteGameSessionInput:
+      type: object
+      properties:
+        score:
+          type: integer
+        won:
+          type: boolean
+      required: [score, won]
+
+    GameSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        minigame:
+          $ref: "#/components/schemas/Minigame"
+        score:
+          type: integer
+          nullable: true
+        won:
+          type: boolean
+          nullable: true
+        xpEarned:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum: [pending, active, completed]
+        createdAt:
+          type: string
+      required: [id, minigame, status, createdAt]
+
+    Dashboard:
+      type: object
+      properties:
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityEntry"
+        topBonds:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bond"
+        activeRooms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Room"
+        dailyChallenges:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyChallenge"
+        heartsReceived:
+          type: integer
+        gamesPlayedToday:
+          type: integer
+        streakDays:
+          type: integer
+      required: [profile, recentActivity, topBonds, activeRooms, dailyChallenges, heartsReceived, gamesPlayedToday, streakDays]
+
+    DailyChallenge:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        xpReward:
+          type: integer
+        completed:
+          type: boolean
+        type:
+          type: string
+      required: [id, title, description, xpReward, completed, type]
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        totalXp:
+          type: integer
+        bondsCount:
+          type: integer
+        gamesWon:
+          type: integer
+      required: [rank, user, totalXp, bondsCount, gamesWon]
+
+    CompatibilityResult:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        score:
+          type: integer
+          description: "0-100 compatibility score"
+        title:
+          type: string
+        breakdown:
+          type: object
+          properties:
+            vibe:
+              type: integer
+            chaos:
+              type: integer
+            loyalty:
+              type: integer
+            humor:
+              type: integer
+          required: [vibe, chaos, loyalty, humor]
+        verdict:
+          type: string
+        bondXp:
+          type: integer
+      required: [user, score, title, breakdown, verdict, bondXp]
+
+    ProfileStats:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        totalXp:
+          type: integer
+        totalHearts:
+          type: integer
+        totalGames:
+          type: integer
+        gamesWon:
+          type: integer
+        longestStreak:
+          type: integer
+        topBond:
+          $ref: "#/components/schemas/Bond"
+          nullable: true
+        favoriteRoom:
+          type: string
+          nullable: true
+        topEmojis:
+          type: array
+          items:
+            type: string
+        chaosLevel:
+          type: integer
+        lateNightActivity:
+          type: integer
+        toxicDuoTitle:
+          type: string
+          nullable: true
+      required: [user, totalXp, totalHearts, totalGames, gamesWon, longestStreak, topEmojis, chaosLevel, lateNightActivity]
