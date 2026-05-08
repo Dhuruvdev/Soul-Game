@@ -1,30 +1,28 @@
-import React, { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { 
-  useGetUserProfile, 
-  useGetBond, 
-  useSendHeart, 
+import {
+  useGetUserProfile,
+  useGetBond,
+  useSendHeart,
   useAddFriend,
   getGetUserProfileQueryKey,
   getGetBondQueryKey
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ProfileCard } from "@/components/profile/ProfileCard";
-import { Button } from "@/components/ui/button";
-import { Heart, UserPlus, Sparkles, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Heart, UserPlus, Sparkles, AlertTriangle, ArrowLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 export default function UserProfile() {
   const [, params] = useRoute("/profile/:userId");
   const userId = params?.userId ? parseInt(params.userId) : 0;
   const queryClient = useQueryClient();
 
-  const { data: profile, isLoading: isProfileLoading, error } = useGetUserProfile(userId, {
+  const { data: profile, isLoading, error } = useGetUserProfile(userId, {
     query: { enabled: !!userId }
   });
-  
-  const { data: bond, isLoading: isBondLoading } = useGetBond(userId, {
+  const { data: bond } = useGetBond(userId, {
     query: { enabled: !!userId }
   });
 
@@ -36,13 +34,11 @@ export default function UserProfile() {
       { data: { targetUserId: userId } },
       {
         onSuccess: () => {
-          toast.success(`Sent a heart to ${profile?.displayName}! 💖`);
-          queryClient.invalidateQueries({ queryKey: getGetUserProfileQueryKey(userId) });
-          queryClient.invalidateQueries({ queryKey: getGetBondQueryKey(userId) });
+          toast.success(`Heart sent to ${profile?.displayName}! 💖`);
+          void queryClient.invalidateQueries({ queryKey: getGetUserProfileQueryKey(userId) });
+          void queryClient.invalidateQueries({ queryKey: getGetBondQueryKey(userId) });
         },
-        onError: () => {
-          toast.error("Failed to send heart. They might be too popular right now.");
-        }
+        onError: () => toast.error("Failed to send heart."),
       }
     );
   };
@@ -51,95 +47,117 @@ export default function UserProfile() {
     addFriend.mutate(
       { data: { targetUserId: userId } },
       {
-        onSuccess: () => {
-          toast.success(`Friend request sent to ${profile?.displayName}! 💌`);
-        },
-        onError: () => {
-          toast.error("Couldn't send friend request.");
-        }
+        onSuccess: () => toast.success(`Friend request sent! 💌`),
+        onError: () => toast.error("Couldn't send friend request."),
       }
     );
   };
 
-  if (isProfileLoading) {
+  if (isLoading) {
     return (
-      <div className="max-w-md mx-auto space-y-6 animate-pulse mt-8">
-        <div className="h-10 w-32 bg-white/50 rounded-xl"></div>
-        <div className="h-[600px] w-full bg-white/50 rounded-[2rem]"></div>
+      <div className="max-w-sm mx-auto space-y-4 mt-8 animate-pulse">
+        <Skeleton className="h-10 w-28 rounded-full bg-white/60" />
+        <Skeleton className="h-[560px] w-full rounded-[1.75rem] bg-white/60" />
       </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-        <AlertTriangle className="w-12 h-12 text-destructive mb-4" />
-        <h2 className="text-xl font-bold text-foreground">User not found</h2>
-        <p className="text-muted-foreground mt-2">They might have changed their username or deleted their account.</p>
-        <Button variant="outline" className="mt-6 rounded-xl" asChild>
-          <Link href="/">Go Home</Link>
-        </Button>
+      <div className="flex flex-col items-center justify-center h-[50vh] text-center gap-4">
+        <AlertTriangle className="w-10 h-10" style={{ color: "hsl(345,60%,58%)" }} />
+        <h2 className="text-xl font-black font-display" style={{ color: "hsl(270,40%,38%)" }}>User not found</h2>
+        <Link href="/">
+          <div className="px-6 py-2.5 rounded-full font-black text-sm cursor-pointer" style={{ background: "hsl(270,55%,87%)", color: "hsl(270,45%,45%)" }}>
+            Go Home
+          </div>
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-4 pb-12">
-      <Button variant="ghost" className="rounded-xl text-muted-foreground hover:text-foreground" asChild>
+    <div className="max-w-sm mx-auto space-y-5 mt-4 pb-12">
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <Link href="/friends">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </Link>
-      </Button>
-
-      <ProfileCard profile={profile} />
-
-      <div className="bg-white/60 backdrop-blur-md rounded-2xl p-4 border border-white/50 shadow-sm space-y-3">
-        {bond && (
-          <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/10 mb-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <div>
-                <p className="text-sm font-bold">Bond Level {bond.level}</p>
-                <p className="text-xs text-muted-foreground">{bond.title || "Growing Bond"}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs font-bold text-primary">{bond.xp} XP</p>
-              <p className="text-[10px] text-muted-foreground">{bond.streak} day streak</p>
-            </div>
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm cursor-pointer"
+            style={{ background: "hsl(0,0%,100%)", color: "hsl(270,40%,45%)", boxShadow: "0 2px 8px rgba(130,80,200,0.10)" }}
+          >
+            <ArrowLeft className="w-4 h-4" /> Back
           </div>
-        )}
+        </Link>
+      </motion.div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Button 
-            className="w-full rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-sm"
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.05 }}
+      >
+        <ProfileCard profile={profile} />
+      </motion.div>
+
+      {/* Bond indicator */}
+      {bond && (
+        <motion.div
+          className="flex items-center justify-between px-5 py-3.5 rounded-full"
+          style={{ background: "hsl(270,55%,87%)" }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4" style={{ color: "hsl(270,45%,50%)" }} />
+            <span className="font-black text-sm" style={{ color: "hsl(270,35%,30%)" }}>
+              Bond Level {bond.level}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold" style={{ color: "hsl(270,35%,50%)" }}>{bond.xp} XP</span>
+            <span className="flex items-center gap-1 text-xs font-bold" style={{ color: "hsl(270,45%,48%)" }}>
+              <Zap className="w-3 h-3" /> {bond.streak}d
+            </span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Action pills */}
+      <motion.div
+        className="space-y-2.5"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
             onClick={handleSendHeart}
             disabled={sendHeart.isPending}
+            className="flex items-center justify-center gap-2 py-3.5 rounded-full font-black text-sm cursor-pointer hover:scale-[1.02] transition-transform disabled:opacity-60"
+            style={{ background: "hsl(335,65%,87%)", color: "hsl(270,35%,30%)" }}
             data-testid="button-send-heart"
           >
-            <Heart className="w-4 h-4 mr-2 fill-current" /> Send Heart
-          </Button>
-          <Button 
-            className="w-full rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-sm"
+            <Heart className="w-4 h-4 fill-current" style={{ color: "hsl(345,60%,55%)" }} /> Send Heart
+          </button>
+          <button
             onClick={handleAddFriend}
             disabled={addFriend.isPending}
+            className="flex items-center justify-center gap-2 py-3.5 rounded-full font-black text-sm cursor-pointer hover:scale-[1.02] transition-transform disabled:opacity-60"
+            style={{ background: "hsl(200,70%,87%)", color: "hsl(270,35%,30%)" }}
             data-testid="button-add-friend"
           >
-            <UserPlus className="w-4 h-4 mr-2" /> Add Friend
-          </Button>
+            <UserPlus className="w-4 h-4" /> Add Friend
+          </button>
         </div>
-        
-        <Button 
-          variant="outline" 
-          className="w-full rounded-xl border-primary/20 hover:bg-primary/5 text-primary font-bold shadow-sm mt-2"
-          asChild
-          data-testid="button-check-compatibility"
-        >
-          <Link href={`/compatibility/${profile.id}`}>
-            Check Compatibility 🔮
-          </Link>
-        </Button>
-      </div>
+
+        <Link href={`/compatibility/${profile.id}`} data-testid="button-check-compatibility">
+          <div
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full font-black text-sm cursor-pointer hover:scale-[1.01] transition-transform"
+            style={{ background: "hsl(270,55%,87%)", color: "hsl(270,45%,40%)" }}
+          >
+            🔮 Check Compatibility
+          </div>
+        </Link>
+      </motion.div>
     </div>
   );
 }

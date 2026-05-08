@@ -1,127 +1,160 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { UserProfile } from "@workspace/api-client-react";
-import { Heart, Activity, AlertTriangle, Zap, MapPin, Hash, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Heart, MapPin, Sparkles, Zap, Activity, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProfileCardProps {
   profile: UserProfile;
   isHoverable?: boolean;
+  compact?: boolean;
 }
 
-export function ProfileCard({ profile, isHoverable = false }: ProfileCardProps) {
-  const percentToNextLevel = Math.min(100, Math.max(0, (profile.xp / profile.xpToNext) * 100));
+const STAT_PILLS = [
+  { key: "delulu",             label: "Delulu",   color: "hsl(270,55%,87%)", icon: Activity        },
+  { key: "redFlag",            label: "Red Flag", color: "hsl(345,60%,87%)", icon: AlertTriangle   },
+  { key: "chronicallyOnline",  label: "Online",   color: "hsl(200,70%,87%)", icon: Zap             },
+  { key: "mainCharacterEnergy",label: "MC Energy",color: "hsl(140,55%,85%)", icon: Sparkles        },
+] as const;
+
+export function ProfileCard({ profile, isHoverable = false, compact = false }: ProfileCardProps) {
+  const pct = Math.min(100, Math.max(0, (profile.xp / profile.xpToNext) * 100));
 
   return (
     <motion.div
-      whileHover={isHoverable ? { scale: 1.02, y: -5 } : undefined}
-      className="bg-white/80 backdrop-blur-md rounded-[2rem] p-6 shadow-xl border border-white/50 relative overflow-hidden"
+      whileHover={isHoverable ? { y: -4, scale: 1.01 } : undefined}
+      transition={{ type: "spring", stiffness: 300, damping: 22 }}
+      className="bg-white rounded-[1.75rem] p-6 relative overflow-hidden"
+      style={{ boxShadow: "0 8px 32px rgba(130,80,200,0.13)" }}
     >
-      {/* Top Section */}
+      {/* Inner pastel corner blobs */}
+      <div
+        className="absolute -top-10 -right-10 w-32 h-32 rounded-full pointer-events-none"
+        style={{ background: "hsl(270,55%,87%)", opacity: 0.35 }}
+      />
+      <div
+        className="absolute -bottom-10 -left-10 w-28 h-28 rounded-full pointer-events-none"
+        style={{ background: "hsl(200,70%,87%)", opacity: 0.30 }}
+      />
+
+      {/* ── Avatar centered at top (reference style — no spinning ring) ── */}
       <div className="flex flex-col items-center text-center relative z-10">
-        <div className="relative">
-          <motion.div 
-            animate={{ rotate: 360 }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-2 rounded-full bg-gradient-to-r from-primary via-secondary to-accent opacity-70 blur-md"
-          />
-          <Avatar className="w-28 h-28 border-4 border-white relative z-10 shadow-sm">
+        <div className="relative mb-1">
+          <Avatar
+            className={`border-4 border-white shadow-md ${compact ? "w-20 h-20" : "w-28 h-28"}`}
+            style={{ boxShadow: "0 0 0 4px hsl(270,55%,87%), 0 6px 20px rgba(130,80,200,0.18)" }}
+          >
             <AvatarImage src={profile.avatarUrl || undefined} alt={profile.displayName} />
-            <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
+            <AvatarFallback
+              className="font-black text-2xl font-display"
+              style={{ background: "hsl(270,55%,87%)", color: "hsl(270,45%,50%)" }}
+            >
               {profile.displayName.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-sm z-20">
-            <div className="bg-gradient-to-br from-primary to-secondary text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              Lvl {profile.level}
-            </div>
+          {/* Level badge pill */}
+          <div
+            className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-black whitespace-nowrap"
+            style={{ background: "hsl(270,55%,87%)", color: "hsl(270,45%,45%)" }}
+          >
+            Lvl {profile.level}
           </div>
         </div>
 
-        <h2 className="text-2xl font-extrabold mt-4 text-foreground">{profile.displayName}</h2>
-        <p className="text-muted-foreground font-medium flex items-center gap-1">
-          <Hash className="w-4 h-4" /> {profile.username}
-        </p>
+        {/* ── Big display name — matching reference "Lylac" style ── */}
+        <h2
+          className={`font-black font-display mt-5 leading-none ${compact ? "text-3xl" : "text-4xl"}`}
+          style={{ color: "hsl(270,45%,60%)" }}
+        >
+          {profile.displayName}
+        </h2>
+
+        {/* ── Bullet-separated tags (reference style) ── */}
+        {profile.tags && profile.tags.length > 0 && (
+          <p className="text-sm font-semibold mt-2 leading-relaxed" style={{ color: "hsl(270,35%,62%)" }}>
+            {profile.tags.map((t, i) => (
+              <span key={i}>{i > 0 && " • "}{t}</span>
+            ))}
+          </p>
+        )}
 
         {profile.title && (
-          <Badge variant="outline" className="mt-2 bg-primary/5 text-primary border-primary/20">
+          <span
+            className="mt-3 px-4 py-1 rounded-full text-xs font-bold"
+            style={{ background: "hsl(270,55%,87%)", color: "hsl(270,45%,45%)" }}
+          >
             {profile.title}
-          </Badge>
+          </span>
         )}
       </div>
 
-      {/* Middle Section - XP & Mood */}
-      <div className="mt-6 space-y-4 relative z-10">
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs font-medium text-muted-foreground">
-            <span>XP {profile.xp}</span>
-            <span>Next {profile.xpToNext}</span>
-          </div>
-          <Progress value={percentToNextLevel} className="h-2.5 bg-primary/10" />
+      {/* ── XP Bar ── */}
+      <div className="mt-5 relative z-10">
+        <div className="flex justify-between text-xs font-bold mb-1.5" style={{ color: "hsl(270,30%,60%)" }}>
+          <span>XP {profile.xp.toLocaleString()}</span>
+          <span>Next {profile.xpToNext.toLocaleString()}</span>
         </div>
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "hsl(270,55%,91%)" }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, hsl(270,50%,65%), hsl(335,65%,72%))" }}
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+          />
+        </div>
+      </div>
 
-        {profile.mood && (
-          <div className="bg-accent/20 rounded-xl p-3 text-center text-sm font-medium text-accent-foreground border border-accent/20">
-            💭 {profile.mood}
-          </div>
-        )}
+      {/* ── Mood ── */}
+      {profile.mood && (
+        <div
+          className="mt-4 rounded-2xl px-4 py-2.5 text-center text-sm font-semibold relative z-10"
+          style={{ background: "hsl(290,40%,94%)", color: "hsl(270,35%,48%)" }}
+        >
+          {profile.mood}
+        </div>
+      )}
 
-        {profile.tags && profile.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 justify-center">
-            {profile.tags.map((tag, i) => (
-              <span key={i} className="px-3 py-1 rounded-full bg-secondary/15 text-secondary-foreground text-xs font-medium border border-secondary/20">
-                {tag}
+      {/* ── Stat pills (wide rows matching reference) ── */}
+      <div className="mt-4 space-y-2.5 relative z-10">
+        {STAT_PILLS.map(({ key, label, color, icon: Icon }) => (
+          <div
+            key={key}
+            className="flex items-center justify-between px-5 py-3 rounded-full"
+            style={{ background: color }}
+          >
+            <span className="font-bold text-sm" style={{ color: "hsl(270,35%,32%)" }}>{label}</span>
+            <div className="flex items-center gap-2">
+              <span className="font-black text-base" style={{ color: "hsl(270,45%,45%)" }}>
+                {(profile as Record<string, unknown>)[key] as number}%
               </span>
-            ))}
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(130,80,200,0.12)" }}
+              >
+                <Icon className="w-4 h-4" style={{ color: "hsl(270,45%,50%)" }} />
+              </div>
+            </div>
           </div>
-        )}
+        ))}
       </div>
 
-      {/* Lower Section - Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 mt-6 relative z-10">
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-3 flex flex-col items-center justify-center border border-primary/10">
-          <Activity className="w-5 h-5 text-primary mb-1" />
-          <span className="text-lg font-bold text-foreground">{profile.delulu}%</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Delulu Meter</span>
+      {/* ── Footer row ── */}
+      <div
+        className="mt-5 pt-4 flex items-center justify-between text-sm relative z-10"
+        style={{ borderTop: "1px solid hsl(270,30%,91%)" }}
+      >
+        <div className="flex items-center gap-1.5 font-bold" style={{ color: "hsl(345,60%,58%)" }}>
+          <Heart className="w-4 h-4 fill-current" />
+          <span>{profile.totalHearts} hearts</span>
         </div>
-        <div className="bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-2xl p-3 flex flex-col items-center justify-center border border-destructive/10">
-          <AlertTriangle className="w-5 h-5 text-destructive mb-1" />
-          <span className="text-lg font-bold text-foreground">{profile.redFlag}%</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Red Flag</span>
-        </div>
-        <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-3 flex flex-col items-center justify-center border border-accent/10">
-          <Zap className="w-5 h-5 text-accent-foreground mb-1" />
-          <span className="text-lg font-bold text-foreground">{profile.chronicallyOnline}%</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Chronically Online</span>
-        </div>
-        <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-2xl p-3 flex flex-col items-center justify-center border border-secondary/10">
-          <Sparkles className="w-5 h-5 text-secondary-foreground mb-1" />
-          <span className="text-lg font-bold text-foreground">{profile.mainCharacterEnergy}%</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">MC Energy</span>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-sm relative z-10">
-        <div className="flex items-center gap-1.5 font-medium text-destructive">
-          <Heart className="w-4 h-4 fill-destructive" />
-          <span>{profile.totalHearts} received</span>
-        </div>
-        
         {profile.currentRoom && (
-          <div className="flex items-center gap-1.5 font-medium text-muted-foreground">
-            <MapPin className="w-4 h-4" />
-            <span className="truncate max-w-[100px]">{profile.currentRoom}</span>
+          <div className="flex items-center gap-1.5 font-semibold text-xs" style={{ color: "hsl(270,25%,60%)" }}>
+            <MapPin className="w-3.5 h-3.5" />
+            <span className="truncate max-w-[110px]">{profile.currentRoom}</span>
           </div>
         )}
       </div>
-
-      {/* Decorative blobs inside card */}
-      <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-secondary/10 rounded-full blur-2xl pointer-events-none" />
     </motion.div>
   );
 }

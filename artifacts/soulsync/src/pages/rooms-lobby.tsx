@@ -1,88 +1,79 @@
-import React from "react";
 import { Link } from "wouter";
-import { useListRooms, useJoinRoom } from "@workspace/api-client-react";
-import { Users, DoorOpen, Coffee, BookOpen, HeartCrack, Gamepad2, Mic2, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useListRooms } from "@workspace/api-client-react";
+import { Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
+
+const THEME_CONFIG: Record<string, { emoji: string; pill: string; label: string }> = {
+  sleepover:  { emoji: "🛌", pill: "hsl(270,55%,87%)", label: "lo-fi & cozy" },
+  study:      { emoji: "📚", pill: "hsl(200,70%,87%)", label: "ambient focus" },
+  heartbreak: { emoji: "💔", pill: "hsl(345,60%,87%)", label: "sad indie vibes" },
+  arcade:     { emoji: "🕹️", pill: "hsl(140,55%,85%)", label: "energetic" },
+  gossip:     { emoji: "☕", pill: "hsl(25,70%,87%)",  label: "mystery whispers" },
+  chaotic_vc: { emoji: "🌪️", pill: "hsl(50,70%,87%)",  label: "LOUD & chaotic" },
+};
 
 export default function RoomsLobby() {
   const { data: rooms, isLoading } = useListRooms();
 
-  const getThemeIcon = (theme: string) => {
-    switch(theme) {
-      case 'sleepover': return <Coffee className="w-6 h-6 text-primary" />;
-      case 'study': return <BookOpen className="w-6 h-6 text-accent-foreground" />;
-      case 'heartbreak': return <HeartCrack className="w-6 h-6 text-destructive" />;
-      case 'arcade': return <Gamepad2 className="w-6 h-6 text-secondary-foreground" />;
-      case 'gossip': return <Mic2 className="w-6 h-6 text-primary" />;
-      case 'chaotic_vc': return <Zap className="w-6 h-6 text-accent-foreground" />;
-      default: return <Coffee className="w-6 h-6 text-primary" />;
-    }
-  };
-
-  const getThemeColor = (theme: string) => {
-    switch(theme) {
-      case 'sleepover': return 'from-primary/20 to-primary/5 border-primary/20';
-      case 'study': return 'from-accent/20 to-accent/5 border-accent/20';
-      case 'heartbreak': return 'from-destructive/20 to-destructive/5 border-destructive/20';
-      case 'arcade': return 'from-secondary/20 to-secondary/5 border-secondary/20';
-      case 'gossip': return 'from-primary/20 to-secondary/20 border-primary/20';
-      case 'chaotic_vc': return 'from-accent/20 to-destructive/20 border-accent/20';
-      default: return 'from-muted to-muted/50 border-border';
-    }
-  };
-
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            Rooms Lobby
-          </h1>
-          <p className="text-muted-foreground mt-2 font-medium">Find your vibe and jump in.</p>
-        </div>
-      </div>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+        <h1 className="text-3xl md:text-4xl font-black font-display" style={{ color: "hsl(270,45%,40%)" }}>
+          Rooms Lobby
+        </h1>
+        <p className="mt-1 text-sm font-semibold" style={{ color: "hsl(270,25%,58%)" }}>
+          Find your vibe and jump in.
+        </p>
+      </motion.div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} className="h-48 w-full rounded-[2rem]" />)}
+        <div className="space-y-3">
+          {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-20 rounded-full bg-white/70" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms?.map((room) => (
-            <div 
-              key={room.id}
-              className={`bg-gradient-to-br ${getThemeColor(room.theme)} rounded-[2rem] p-6 border shadow-sm flex flex-col relative overflow-hidden group`}
-            >
-              <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/40 rounded-full blur-2xl group-hover:bg-white/60 transition-all"></div>
-              
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="p-3 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm">
-                  {getThemeIcon(room.theme)}
-                </div>
-                <div className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-                  <Users className="w-3 h-3" />
-                  {room.occupantCount}/{room.maxOccupants}
-                </div>
-              </div>
-
-              <div className="mb-6 relative z-10 flex-1">
-                <h3 className="text-xl font-bold text-foreground mb-1">{room.name}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">{room.description}</p>
-              </div>
-
-              <div className="relative z-10">
-                <Button 
-                  className="w-full rounded-xl shadow-sm bg-white/80 hover:bg-white text-foreground font-bold"
-                  asChild
-                >
-                  <Link href={`/rooms/${room.id}`}>
-                    <DoorOpen className="w-4 h-4 mr-2" /> Join Room
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          ))}
+        <div className="space-y-3">
+          {rooms?.map((room, i) => {
+            const cfg = THEME_CONFIG[room.theme] ?? { emoji: "🏠", pill: "hsl(270,55%,87%)", label: "" };
+            return (
+              <motion.div
+                key={room.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.4 }}
+              >
+                <Link href={`/rooms/${room.id}`}>
+                  <div
+                    className="flex items-center justify-between px-6 py-4 rounded-full cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-transform"
+                    data-testid={`room-card-${room.id}`}
+                    style={{ background: cfg.pill, boxShadow: "0 2px 8px rgba(130,80,200,0.08)" }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{cfg.emoji}</span>
+                      <div>
+                        <p className="font-black text-base" style={{ color: "hsl(270,35%,30%)" }}>{room.name}</p>
+                        <p className="text-xs font-semibold" style={{ color: "hsl(270,25%,52%)" }}>{cfg.label}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-4 h-4" style={{ color: "hsl(270,35%,52%)" }} />
+                        <span className="text-sm font-black" style={{ color: "hsl(270,35%,40%)" }}>
+                          {room.occupantCount}/{room.maxOccupants}
+                        </span>
+                      </div>
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black"
+                        style={{ background: "rgba(130,80,200,0.14)", color: "hsl(270,45%,48%)" }}
+                      >
+                        →
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

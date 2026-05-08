@@ -1,4 +1,3 @@
-import React from "react";
 import { FloatingBackground } from "./FloatingBackground";
 import { Sidebar, MobileNav } from "./Navigation";
 
@@ -11,7 +10,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-[100dvh] flex bg-transparent">
       <FloatingBackground />
       <Sidebar />
-      <main className="flex-1 md:ml-64 p-4 md:p-8 lg:p-12 pb-24 md:pb-12 max-w-[1200px] mx-auto w-full z-10 relative">
+      <main className="flex-1 md:ml-64 p-5 md:p-8 lg:p-12 pb-28 md:pb-12 max-w-[1240px] mx-auto w-full z-10 relative">
         {children}
       </main>
       <MobileNav />

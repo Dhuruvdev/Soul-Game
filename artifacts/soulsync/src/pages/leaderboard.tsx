@@ -1,73 +1,96 @@
-import React from "react";
 import { Link } from "wouter";
 import { useGetLeaderboard } from "@workspace/api-client-react";
-import { Trophy, Star, Sparkles } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
+
+const RANK_PILL = [
+  "hsl(50,70%,87%)",    // #1 gold-ish
+  "hsl(270,35%,88%)",   // #2 silver-ish
+  "hsl(25,70%,87%)",    // #3 bronze-ish
+];
 
 export default function Leaderboard() {
   const { data: leaderboard, isLoading } = useGetLeaderboard({ limit: 10 });
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-700">
-      <div className="text-center mb-12">
-        <div className="w-20 h-20 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-yellow-500/20">
-          <Trophy className="w-10 h-10 text-white" />
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight">Top Souls</h1>
-        <p className="text-muted-foreground mt-3 font-medium">The most active and adored profiles.</p>
-      </div>
+    <div className="max-w-2xl mx-auto space-y-6">
+      <motion.div
+        className="text-center"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+      >
+        <h1 className="text-3xl md:text-4xl font-black font-display" style={{ color: "hsl(270,45%,40%)" }}>
+          Top Souls
+        </h1>
+        <p className="mt-1 text-sm font-semibold" style={{ color: "hsl(270,25%,58%)" }}>
+          The most active and adored players.
+        </p>
+      </motion.div>
 
       {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-24 w-full rounded-[2rem]" />)}
+        <div className="space-y-3">
+          {[1,2,3,4,5].map(i => <Skeleton key={i} className="h-20 rounded-full bg-white/70" />)}
         </div>
       ) : (
-        <div className="space-y-4">
-          {leaderboard?.map((entry, index) => {
-            const isTop3 = index < 3;
+        <div className="space-y-3">
+          {leaderboard?.map((entry, i) => {
+            const pillBg = i < 3 ? RANK_PILL[i] : "hsl(0,0%,100%)";
+            const rankLabel = i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${entry.rank}`;
+
             return (
-              <motion.div 
+              <motion.div
                 key={entry.user.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: i * 0.06, duration: 0.4 }}
               >
                 <Link href={`/profile/${entry.user.id}`}>
-                  <div className={`
-                    flex items-center gap-4 p-4 rounded-[2rem] border transition-all cursor-pointer group
-                    ${index === 0 ? 'bg-gradient-to-r from-yellow-50 to-white border-yellow-200 shadow-md scale-[1.02]' : 
-                      index === 1 ? 'bg-gradient-to-r from-slate-50 to-white border-slate-200 shadow-sm' :
-                      index === 2 ? 'bg-gradient-to-r from-orange-50 to-white border-orange-200 shadow-sm' :
-                      'bg-white/60 hover:bg-white border-white/50 hover:border-primary/20 shadow-sm'}
-                  `}>
-                    
-                    <div className={`w-12 h-12 flex items-center justify-center font-black text-xl rounded-full shrink-0
-                      ${index === 0 ? 'text-yellow-600 bg-yellow-100' : 
-                        index === 1 ? 'text-slate-600 bg-slate-200' :
-                        index === 2 ? 'text-orange-700 bg-orange-100' :
-                        'text-muted-foreground bg-muted/50'}
-                    `}>
-                      #{entry.rank}
-                    </div>
+                  <div
+                    className="flex items-center gap-4 px-5 py-3.5 rounded-full cursor-pointer hover:scale-[1.01] transition-transform"
+                    data-testid={`leaderboard-entry-${entry.rank}`}
+                    style={{
+                      background: pillBg,
+                      boxShadow: i === 0
+                        ? "0 4px 16px rgba(200,160,60,0.18)"
+                        : "0 2px 8px rgba(130,80,200,0.08)",
+                    }}
+                  >
+                    {/* Rank */}
+                    <span className="text-xl w-8 text-center font-black shrink-0">
+                      {rankLabel}
+                    </span>
 
-                    <Avatar className={`border-2 ${index === 0 ? 'w-16 h-16 border-yellow-400' : 'w-12 h-12 border-white'} shadow-sm`}>
+                    {/* Avatar */}
+                    <Avatar className="border-2 border-white shadow-sm w-10 h-10 shrink-0">
                       <AvatarImage src={entry.user.avatarUrl || undefined} />
-                      <AvatarFallback>{entry.user.displayName.substring(0, 2)}</AvatarFallback>
+                      <AvatarFallback
+                        className="text-xs font-black"
+                        style={{ background: "hsl(270,55%,87%)", color: "hsl(270,45%,48%)" }}
+                      >
+                        {entry.user.displayName.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
 
+                    {/* Name + level */}
                     <div className="flex-1 min-w-0">
-                      <h3 className={`font-bold truncate ${index === 0 ? 'text-xl' : 'text-lg'}`}>
+                      <p className="font-black text-sm truncate" style={{ color: "hsl(270,35%,28%)" }}>
                         {entry.user.displayName}
-                        {index === 0 && <Star className="inline w-4 h-4 text-yellow-500 ml-1 fill-yellow-500 mb-1" />}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">Lvl {entry.user.level} • {entry.bondsCount} bonds</p>
+                      </p>
+                      <p className="text-xs font-semibold" style={{ color: "hsl(270,25%,55%)" }}>
+                        Lvl {entry.user.level}
+                      </p>
                     </div>
 
-                    <div className="text-right shrink-0 px-2">
-                      <div className="font-black text-primary text-lg">{entry.totalXp.toLocaleString()}</div>
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total XP</div>
+                    {/* XP */}
+                    <div className="text-right shrink-0">
+                      <p className="font-black text-base" style={{ color: "hsl(270,50%,55%)" }}>
+                        {entry.totalXp.toLocaleString()}
+                      </p>
+                      <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: "hsl(270,20%,60%)" }}>
+                        XP
+                      </p>
                     </div>
                   </div>
                 </Link>
